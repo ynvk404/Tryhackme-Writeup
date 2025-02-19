@@ -1,37 +1,30 @@
-# 📌 HTTP/2 - Tổng quan và Bảo mật  
+📌 HTTP/2 - Tổng quan
+🔹 HTTP/1.1 vs HTTP/2
+HTTP/1.1: Dùng văn bản thuần (text-based), chậm hơn.
+HTTP/2: Dùng nhị phân (binary), tối ưu hơn.
+🔹 Cấu trúc Request trong HTTP/2
+Có pseudo-headers đặc biệt (:method, :path, :authority...)
+Headers thông thường (user-agent, content-length...)
+Không dùng \r\n để phân tách, mà dùng frame có độ dài xác định.
+⚠️ Request Smuggling và HTTP/2
+❌ Lỗ hổng Request Smuggling trong HTTP/1.1
+HTTP/1.1 có hai cách xác định độ dài request:
+Content-Length
+Transfer-Encoding: chunked
+➡️ Nếu proxy hiểu sai, có thể chèn request ẩn để bypass.
+📌 Ví dụ Request Smuggling (HTTP/1.1)
 
-## 🔍 1. HTTP/1.1 vs HTTP/2  
-- **HTTP/1.1**: Sử dụng văn bản thuần (`text-based`), dễ đọc nhưng kém hiệu quả.  
-- **HTTP/2**: Sử dụng giao thức **nhị phân** (`binary`), nhanh hơn và tối ưu hơn.  
-
-## 🚀 2. Cấu trúc Request trong HTTP/2  
-### **📌 Đặc điểm quan trọng của HTTP/2 Request**  
- HTTP/2 có **các pseudo-header** đặc biệt, tất cả đều bắt đầu bằng dấu 
-   - Ví dụ: `:method`, `:path`, `:authority`, `:scheme`  
- Sau các pseudo-header, request có thể chứa các header thông thường như:  
-   - `user-agent`, `content-length`, `accept-encoding`  
-
-### **📌 Sự khác biệt trong cách phân tách Header và Body**  
-- **HTTP/1.1**: Dùng `\r\n` để phân cách giữa header và body.  
-- **HTTP/2**: Không dùng ký tự đặc biệt, mà chia request thành **các frame**.  
-- Mỗi frame có **trường độ dài (length field)** để xác định kích thước.  
-
-## ⚠️ 3. HTTP Request Smuggling và HTTP/2  
-### **❌ Lỗ hổng Request Smuggling trong HTTP/1.1**  
-- Do sự **mơ hồ trong cách xác định kích thước request body**.  
-- Có **2 cách chính** để xác định độ dài request trong HTTP/1.1:  
-  1️⃣ `Content-Length`  
-  2️⃣ `Transfer-Encoding: chunked`  
-
-  ➡️ Nếu proxy và backend hiểu khác nhau về điểm kết thúc request, hacker có thể **chèn thêm request ẩn**.  
-
-📌 **Ví dụ request smuggling trong HTTP/1.1**  
-```http
+http
+Sao chép
+Chỉnh sửa
 POST / HTTP/1.1
-Host: vulnerable.com
+Host: victim.com
 Content-Length: 13
 Transfer-Encoding: chunked
 
 0
 
 SMUGGLED DATA
+✅ HTTP/2 Khắc phục thế nào?
+Xác định rõ độ dài request bằng frame length, tránh nhầm lẫn.
+Không còn lỗi Request Smuggling như HTTP/1.1.
