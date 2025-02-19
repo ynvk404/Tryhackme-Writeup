@@ -1,1 +1,0 @@
-# Tryhackme-Writeup
