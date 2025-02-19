@@ -109,9 +109,35 @@
   Injected-Header: evil
 ```
 - => Dẫn đến lỗi **Smuggling**.  
-- ### **📌 LAB**.
+- ### **📌 LAB 1 - HTTP2/DESYNC**.
 - Sau khi đã hiểu sơ qua về HTTP/2 và Smuggling giờ ta sẽ đi vào làm lab.
-- 
+- Đầu tiên khi truy cập vào đường link giao diện hiện lên như sau.  
+![image](https://github.com/user-attachments/assets/031a9e02-30d8-42db-bc38-6b94b61b428e)  
+- Quan sát thấy có một bài viết, ta có thể chọn like hoặc dislike.  
+- Ta sẽ xem cách ứng dụng hoạt động:
+- Insecpt để kiểm tra thấy web lưu 1 sesion cookie để định danh người dùng.  
+![image](https://github.com/user-attachments/assets/08536186-1b34-4980-aa53-86a0154aa94f).  
+- Thử ấn like thì thấy 1 request GET HTTP/2 được gửi đi. 
+![image](https://github.com/user-attachments/assets/b89886cb-9856-4614-bd58-bdfd72a08755).
+- Trong đó có PostId ta có thể thử gửi 1 request với PostId khác để bắt người dùng like bài viết đó mà không hề hay biết.
+- Ta sẽ thử tấn công qua Content-Length = 0 và HTTP/1.1.
+ 📌 **PAYLOAD**
+ ```
+   Content-Length: 0
+
+   GET /post/like/12315198742342 HTTP/1.1
+   X: F
+ ```  
+- Khi request này bị downgrade từ HTTP/2 xuống HTTP/1.1, reverse proxy có thể bị nhầm lẫn và coi đây là một request khác.
+- x:F để tránh lỗi cú pháp HTTP/1.1, vì request phải có ít nhất một header.
+![image](https://github.com/user-attachments/assets/e3671c23-d262-4552-800c-f69746e5d26e)
+- Khi ta gửi request kèm với payload đi response sẽ trả về như trên.
+- ⚠️ **Lưu ý** :  Không được để dòng trống sau X: f, vì nếu có dòng trống, request tiếp theo từ victim sẽ không bị nối vào mà trở thành một request riêng biệt.
+- Sau đó sẽ chờ 1 thời gian để nạn nhân dính bẫy nối tiếp vào.
+![image](https://github.com/user-attachments/assets/94e791e7-882c-42ec-9d50-42206a054a3a)
+FLag đã xuất hiện : THM{my_name_is_a_flag}
+
+
 
   
   
