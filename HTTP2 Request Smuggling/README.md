@@ -25,12 +25,12 @@ Content-Length: 13
 Transfer-Encoding: chunked  
 
 0  
-
 SMUGGLED DATA
-
-
-Để tránh mơ hồ HTTP/2 đính kèm **một trường kích thước** cho mỗi phần của request, giúp bộ phân tích(**parse**) biết chính xác mà đọc.
-
+```
+- Để tránh mơ hồ HTTP/2 đính kèm **một trường kích thước** cho mỗi phần của request, giúp bộ phân tích(**parse**) biết chính xác mà đọc.
+📌 Tại HTTP/2 vẫn có thể bị Request Smuggling?
+HTTP/2 không sử dụng Content-Length hay Transfer-Encoding để xác định độ dài request.
+Nhưng nếu load balancer/reverse proxy nhận HTTP/2 rồi chuyển thành HTTP/1.1, nó phải dịch request sang định dạng HTTP/1.1.
 
 
 
