@@ -6,7 +6,7 @@
 
 ## 🚀 2. Cấu trúc Request trong HTTP/2  
 ### **📌 Đặc điểm quan trọng của HTTP/2 Request**  
-✅ HTTP/2 có **các pseudo-header** đặc biệt, tất cả đều bắt đầu bằng dấu `:`  
+✅ HTTP/2 có **các pseudo-header** đặc biệt, tất cả đều bắt đầu bằng dấu 
    - Ví dụ: `:method`, `:path`, `:authority`, `:scheme`  
 ✅ Sau các pseudo-header, request có thể chứa các header thông thường như:  
    - `user-agent`, `content-length`, `accept-encoding`  
