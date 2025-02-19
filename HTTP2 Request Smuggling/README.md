@@ -136,7 +136,47 @@
 - Sau đó sẽ chờ 1 thời gian để nạn nhân dính bẫy nối tiếp vào.
 ![image](https://github.com/user-attachments/assets/94e791e7-882c-42ec-9d50-42206a054a3a)
 FLag đã xuất hiện : THM{my_name_is_a_flag}
+- ### **📌 LAB 2 - HTTP/2 Request Tunneling.**.  
+- **Ví dụ trong bài lab với HAProxy (CVE-2019-19330).**  
+- Request Tunneling là một dạng HTTP Request Smuggling, nhưng khác với Desync Attack, nó xảy ra khi mỗi người dùng có một backend connection riêng thay vì chia sẻ một kết nối chung. Điều này có nghĩa là kẻ tấn công không thể tác động trực tiếp đến request của người dùng khác, nhưng vẫn có thể chèn request vào backend của chính mình để khai thác lỗ hổng trong ứng dụng.
+![image](https://github.com/user-attachments/assets/820ea5e4-da72-48c0-a939-8641e85c1230).  
+- Khi mở lên ta thấy có /admin click vào thì bị 403, nên ta sẽ click vào phần /hello.
+![image](https://github.com/user-attachments/assets/748f958c-d594-4fa0-97fa-3f2bd23a6806).  
+- Thử nhập vào ô tìm kiếm xong click search, ta thấy 1 request POST /hello với tham số q gửi đi.
+![image](https://github.com/user-attachments/assets/87e23b15-db98-49f7-92df-1c1e4699dfd1)
+- Kết quả hiện ra chính là giá trị của tham số q. ta cũng thấy có Content-Length: 8 mặc dù HTTP/2 sẽ bỏ qua.  
+![image](https://github.com/user-attachments/assets/9b4666bf-4907-4ea7-a953-cf73f175a8af) 
+- Hầu hết các trình duyệt sẽ thêm header này vào tất cả các yêu cầu HTTP/2 để phần sau vẫn sẽ nhận được header độ dài nội dung hợp lệ nếu xảy ra drowngrade HTTP.  
+- Ta sẽ lợi dụng lỗ hổng trong HAProxy, cho phép chèn CRLF vào headers để rò rỉ các header nội bộ của backend.
+- **CRLF (\r\n)** là ký tự kết thúc header trong HTTP.
+- Khi một request có dòng header như:
+```
+   Foo: something\r\nX-Internal: secret-token\r\n
+```
+- HAProxy có thể hiểu đây là hai header khác nhau:
+```
+   Foo: something
+   X-Internal: secret-token
+```
+Do đó ta sẽ chèn Payload này vào header tùy chỉnh (Foo) để tạo một request thứ hai:
+```
+   HOST: 10.10.152.146:8100
+   POST /hello HTTP/1.1
+   Content-Length: 300
+   HOST: 10.10.152.146:8100
+   Content-Type: application/x-www-form-urlencoded
+   
+   q = 
+```
 
+#Giải thích : 
+- Request ban đầu gửi đến HAProxy. Proxy HAProxy không nhận ra sự bất thường vì HTTP/2 cho phép ký tự nhị phân trong header.  
+- Tuy nhiên, khi chuyển request về backend (chạy HTTP/1.1), nó sẽ tách thành hai request do CRLF.
+- Backend đọc request đầu tiên, thấy Content-Length: 0, nên hiểu rằng nó không có body và xử lý như request bình thường.
+- Request thứ hai bắt đầu ngay sau đó, nhưng backend vẫn gán các header nội bộ vào nó trước khi xử lý body.
+- Khi backend xử lý q=, nó nhận ra rằng body chứa luôn cả phần header nội bộ sẽ bị đẩy vào body do lỗi tách request.
+- ![image](https://github.com/user-attachments/assets/99723650-65f3-4f2c-b62f-ad455ea8ec9e).
+- Flag xuất hiện khi gửi : ![image](https://github.com/user-attachments/assets/24417e0a-8828-47c3-89b9-d03bf38fcaec)
 
 
   
