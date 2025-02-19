@@ -14,7 +14,7 @@
 ### **📌 Sự khác biệt trong cách phân tách Header và Body**  
 - **HTTP/1.1**: Dùng `\r\n` để phân cách giữa header và body.  
 - **HTTP/2**: Không dùng ký tự đặc biệt, mà chia request thành **các frame**.  
-  - Mỗi frame có **trường độ dài (length field)** để xác định kích thước.  
+- Mỗi frame có **trường độ dài (length field)** để xác định kích thước.  
 
 ## ⚠️ 3. HTTP Request Smuggling và HTTP/2  
 ### **❌ Lỗ hổng Request Smuggling trong HTTP/1.1**  
