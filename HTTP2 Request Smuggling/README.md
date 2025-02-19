@@ -6,12 +6,14 @@ HTTP/2: Dùng nhị phân (binary), tối ưu hơn.
 Có pseudo-headers đặc biệt (:method, :path, :authority...)
 Headers thông thường (user-agent, content-length...)
 Không dùng \r\n để phân tách, mà dùng frame có độ dài xác định.
+
 ⚠️ Request Smuggling và HTTP/2
 ❌ Lỗ hổng Request Smuggling trong HTTP/1.1
 HTTP/1.1 có hai cách xác định độ dài request:
 Content-Length
 Transfer-Encoding: chunked
 ➡️ Nếu proxy hiểu sai, có thể chèn request ẩn để bypass.
+
 📌 Ví dụ Request Smuggling (HTTP/1.1)
 
 http
