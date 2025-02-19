@@ -23,7 +23,7 @@
   1️⃣ `Content-Length`  
   2️⃣ `Transfer-Encoding: chunked`  
 
-➡️ Nếu proxy và backend hiểu khác nhau về điểm kết thúc request, hacker có thể **chèn thêm request ẩn**.  
+  ➡️ Nếu proxy và backend hiểu khác nhau về điểm kết thúc request, hacker có thể **chèn thêm request ẩn**.  
 
 📌 **Ví dụ request smuggling trong HTTP/1.1**  
 ```http
