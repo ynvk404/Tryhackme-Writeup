@@ -168,7 +168,6 @@ Do đó ta sẽ chèn Payload này vào header tùy chỉnh (Foo) để tạo m�
    
    q = 
 ```
-
 #Giải thích : 
 - Request ban đầu gửi đến HAProxy. Proxy HAProxy không nhận ra sự bất thường vì HTTP/2 cho phép ký tự nhị phân trong header.  
 - Tuy nhiên, khi chuyển request về backend (chạy HTTP/1.1), nó sẽ tách thành hai request do CRLF.
@@ -177,7 +176,41 @@ Do đó ta sẽ chèn Payload này vào header tùy chỉnh (Foo) để tạo m�
 - Khi backend xử lý q=, nó nhận ra rằng body chứa luôn cả phần header nội bộ sẽ bị đẩy vào body do lỗi tách request.
 - ![image](https://github.com/user-attachments/assets/99723650-65f3-4f2c-b62f-ad455ea8ec9e).
 - Flag xuất hiện khi gửi : ![image](https://github.com/user-attachments/assets/24417e0a-8828-47c3-89b9-d03bf38fcaec)
+- ### **📌 LAB 3 - Bypassing Frontend Restrictions**.  
+- Nếu frontend hỗ trợ HTTP/2 nhưng backend chỉ hỗ trợ HTTP/1.1, ta có thể khai thác kỹ thuật HTTP/2 Request Smuggling chèn CL=0 để bỏ qua kiểm tra của proxy.  
+![image](https://github.com/user-attachments/assets/11877eb3-3296-4ae7-990e-f7f0beaec386)
+- Ta thấy cách smuggle request đến /admin bị cấm ở đây, thông qua /hello, vì nó được phép.
+- Ở đây ta sẽ sử dụng POST thay vì GET vì GET requests thường được cache, nghĩa là nếu một request đến /hello đã có trong cache, proxy sẽ trả về nội dung từ cache thay vì chuyển tiếp nó đến backend.
+- Payload:
+    ```
+     bar 
+     Host: 10.10.152.146:8100
+    
+     GET /admin HTTP/1.1 
+     X-Fake:abc
+    ```
+- Nếu proxy chỉ kiểm tra request đầu tiên (bar), backend có thể vô tình xử lý request /admin mà không bị chặn.
+- ![image](https://github.com/user-attachments/assets/bc465d3c-b59c-43ad-a996-4e23fa82f939)
+- Flag : ![image](https://github.com/user-attachments/assets/3d81ea48-8097-4528-9115-12033242456b)
+- ### **📌 LAB 4 - Web Cache Poisoning**.
+- Web Cache Poisoning (đầu độc bộ nhớ đệm web) là một kỹ thuật tấn công mà kẻ xấu lợi dụng cơ chế cache của máy chủ hoặc proxy để lưu trữ nội dung độc hại hoặc không mong muốn, khiến người dùng khác nhận được nội dung bị thay đổi khi truy cập trang web.  
+- HAProxy – là một proxy có cơ chế cache.  
+- Đầu tiên ta sẽ quan sát source website thấy có 1 script ta sẽ click vào xem.
+![image](https://github.com/user-attachments/assets/b14edeb7-9714-41e7-bf53-96906606f47d)
+- Nội dung source
+    ```
+       var str = "Welcome_to_my_app!";
+       var i =0;
+    
+       function showText(){
+           var char = str.substring(i++, i);
+           if(char){ 
+                   document.getElementById('msg').innerText += char;
+    	       setTimeout("showText();", 250);
+           }
+       }
+   ```
+- Có nghĩa là hàm showText sẽ được gọi khi load trang. ta sẽ tìm cách để đầu độc bộ nhớ cache của file script này để đánh cắp cookie.
 
 
-  
   
