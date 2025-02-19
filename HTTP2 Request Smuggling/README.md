@@ -27,4 +27,4 @@ Transfer-Encoding: chunked
 0  
 
 SMUGGLED DATA
-
+Để tránh mơ hồ HTTP/2 đính kèm **một trường kích thước** cho mỗi phần của request, giúp bộ phân tích(**parse**) biết chính xác mà đọc.
