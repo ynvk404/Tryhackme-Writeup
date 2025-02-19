@@ -14,8 +14,8 @@
 ### ⚠️ Request Smuggling và HTTP/2  
 #### ❌ Lỗ hổng Request Smuggling trong HTTP/1.1  
 - HTTP/1.1 có hai cách xác định độ dài request:  
-  - `Content-Length`  
-  - `Transfer-Encoding: chunked`  
+1. `Content-Length`  
+2. `Transfer-Encoding: chunked`  
 
 📌 **Ví dụ Request Smuggling (HTTP/1.1)**  
 ```http
