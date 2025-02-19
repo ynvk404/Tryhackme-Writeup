@@ -210,7 +210,46 @@ Do đó ta sẽ chèn Payload này vào header tùy chỉnh (Foo) để tạo m�
            }
        }
    ```
-- Có nghĩa là hàm showText sẽ được gọi khi load trang. ta sẽ tìm cách để đầu độc bộ nhớ cache của file script này để đánh cắp cookie.
+- Có nghĩa là hàm showText sẽ được gọi khi load trang. ta sẽ tìm cách để đầu độc bộ nhớ cache của file script này để đánh cắp cookie.  
+- Có thể đánh cắp được cookie là do, Haproxy lưu trữ phản hồi từ backend trong cache.  
+- Khi người dùng yêu cầu /static/text.js ở đây load trang, nếu tệp này đã có trong cache, nó sẽ được gửi ngay từ HAProxy mà không cần truy vấn backend.  
+- Tấn công lợi dụng điều này bằng cách đầu độc cache để thay thế nội dung gốc của /static/text.js bằng mã JavaScript độc hại.  
+- Khi đó người dùng load trang sẽ bị gửi cookie.
+![image](https://github.com/user-attachments/assets/f452f936-b7ae-4ef8-88d8-9de653364515)
+- Đây là 1 script cơ bản để thực hiện gửi cookie nạn nhân tới server của thm với địa chỉ ip là bài cho.
+- Gửi file script này lên để đầu độc cache.
+- Ta cần tìm cách bắc cầu khi load lại trang sẽ truy cập vào /static/text.js nhưng do bị smuggling nên sẽ xử lí /static/myscript.js
+- Chèn payload thông qua header Foo: để thực hiện HTTP Request Smuggling từ đó backend xử lý /static/myscript.js khi truy cập /static/text.js.
+- Payload :
+  ```
+  bar 
+  Host: 10.10.152.146:8100 
+  
+  GET /static/uploads/myscript.js HTTP/1.1\
+  ```
+  ![image](https://github.com/user-attachments/assets/5bd457f6-aecd-4289-909b-c6bbf4c59bec)
+- Chú ý: Pragma: no-cache, Foo: bar để chèn vào.
+- Request thực tế bị chia thành hai request riêng biệt, trong đó request thứ hai sẽ thực thi script của ta.
+- Sau đó ta cần kiểm tra server có phản hồi không.
+  `Curl -kv https://10.10.152.146:8100/static/text.js`
+  ![image](https://github.com/user-attachments/assets/8b42e5c6-aafb-4d99-9445-8f455fb14d45)
+ 
+- Để nhận flag ta phải tạo server
+- Đầu tiên tạo chứng chỉ SSL để chạy HTTPS server
+-
+  ```
+  openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes \
+  -subj "/C=VN/ST=Hanoi/L=Hanoi/O=KMA/OU=Security/CN=localhost" 
+  ```
+**SERVER**:
+![image](https://github.com/user-attachments/assets/7ecb53ca-278f-4be3-bb82-5c4a85b060f3)
+![image](https://github.com/user-attachments/assets/83691c4c-3c3c-44a0-becd-945534688cd2)
+ Khởi tạo HTTP Server:
 
+0.0.0.0 → Lắng nghe trên tất cả các địa chỉ IP (cho phép kết nối từ bất kỳ máy nào).
+8002 → Cổng server đang chạy.
+Flag : ![image](https://github.com/user-attachments/assets/1a7340da-2164-4e8c-b964-fb6a7771654d)
+
+  
 
   
